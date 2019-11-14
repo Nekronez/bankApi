@@ -1,5 +1,5 @@
 <?php
-
+//test
 namespace App;
 
 use Illuminate\Auth\Authenticatable;
