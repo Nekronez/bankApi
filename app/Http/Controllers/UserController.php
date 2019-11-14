@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as DB;
-use Log;
 use Illuminate\Support\Facades\Validator;
+use \App\User;
+use Log;
 
 class UserController extends Controller
 {
@@ -23,51 +24,119 @@ class UserController extends Controller
     {
 //	var_dump($request);
 
-        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+	    $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
 
-	$validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'phone' => 'required|size:11',
-	    'password' => 'required',
-        ]);
+		$validator = Validator::make($request->all(), [
+	    	'name' => 'required',
+	    	'lastName' => 'required',
+	    	'secondName' => 'required',
+	        'phone' => 'required|size:11',
+		    'password' => 'required',
+	    ]);
 
-	if ($validator->fails()) {
-    	    return response()->json($validator->errors(), 400);
+		if ($validator->fails()) {
+	        return response()->json($validator->errors(), 400);
+		}
+
+		try{
+			$user = new User;
+	 		$user->name = $request->name;
+	 		$user->lastName = $request->lastName;
+	 		$user->secondName = $request->secondName;
+	        $user->phone = $request->phone;
+		    $user->password = password_hash($request->password, PASSWORD_DEFAULT );
+
+		    $phoneCheck = User::where('phone', $user->phone)
+								->count();
+		    if($phoneCheck > 0) {
+				$data = ["errorMessage" => "This phone is already in the database"];
+	            return response(json_encode($data), 400, $headers);
+		    }
+
+            $user->save();
+    	    return response(json_encode($user), 200, $headers);
+		} catch (\Exception $e) {
+	        $data = ["errorMessage" => "Server error: ".$e->getMessage()];
+	        return response(json_encode($data), 500, $headers);
+	    }
 	}
 
-	try{
-            $name = $request->name;
+    public function getUser(Request $request, $id)
+    {
+		$headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+		try{
+			$user = DB::table('users')
+						->select('id', 'name', 'phone')
+						->where('id', $id)
+						->get();
+			if(count($user) == 0) {
+				$data = ["errorMessage" => "User is not found"];
+     	        return response(json_encode($data), 500, $headers);
+
+			}
+            return response(json_encode($user), 200, $headers);
+		} catch (\Exception $e) {
+            $data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
+            return response(json_encode($data), 500, $headers);
+        }
+
+    }
+
+	public function putUser(Request $request, $id)
+    {
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+		$validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'phone' => 'required|size:11',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        try{
+			$name = $request->name;
             $phone = $request->phone;
-	    $password = password_hash($request->password, PASSWORD_DEFAULT );
-	Log::info('2Showing user: ');
+            $password = password_hash($request->password, PASSWORD_DEFAULT );
 
-
-	    $phoneCheck = DB::table('users')->where('phone', $phone)->count();
-	    if($phoneCheck > 0) {
-		$data = ["errorMessage" => "This phone is already in the database"];
-                return response(json_encode($data), 400, $headers);
-	    }
-	Log::info('1Showing user: ');
-
-            $id = DB::table('users')->insertGetId(
-            	[
-      	            'name' => $name,
-                    'phone' => $phone,
-		    'password' => $password
-                ]
-	);
-
-            $data = ["id" => $id, "name" => $name, "phone" => $phone];
-            return response(json_encode($data), 200, $headers);
+			$affected = DB::table('users')
+             			->where('id', '=', $id)
+            			->update(['name' => $name], ['phone' => $phone], ['password' => $password]);
+            if($affected == 0) {
+                $data = ["errorMessage" => "User is not found"];
+                return response(json_encode($data), 500, $headers);
+            }else{
+                $data = ["errorMessage" => "User chenged"];
+	            return response(json_encode($data), 200, $headers);
+			}
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
-            return response(json_encode($data), 500)//->json($data)
-		             ->header('Content-Type', 'application/json; charset=utf-8');//(var_dump($data), 500, $headers);
+            return response(json_encode($data), 500, $headers);
         }
     }
 
-    public function phpinf()
+    public function deleteUser(Request $request, $id)
     {
-	return response(phpinfo(), 200);
-    }
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+        try{
+            $affected = DB::table('users')
+                        ->where('id', '=', $id)
+                        ->delete();
+                        //->get();
+            if($affected == 0) {
+                $data = ["errorMessage" => "User is not found"];
+                return response(json_encode($data), 500, $headers);
+            }else{
+                $data = ["errorMessage" => "User delited"];
+                return response(json_encode($data), 200, $headers);
+			}
+        } catch (\Exception $e) {
+            $data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
+            return response(json_encode($data), 500, $headers);
+        }
+	}
 }

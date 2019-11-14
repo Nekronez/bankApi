@@ -48,13 +48,8 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-//	var_dump($e);
-//	return parent::render($request, $e);
-
-	$parentRender = parent::render($request, $e);
-//	var_dump($parentRender);
-
-        Log::info('ERRORmessage: '.$e->getMessage() );
+		$parentRender = parent::render($request, $e);
+        Log::info('ERRORmessage: '.$e );
 
 
 	// if parent returns a JsonResponse

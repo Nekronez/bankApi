@@ -18,6 +18,11 @@ $router->get('/', function () use ($router) {
 $router->group(['middleware' => 'jwt.auth'], function() use ($router) 
     {
         $router->post('card', 'CardController@createCard');
+		$router->get('users/{userId}/cards/{id}', 'CardController@getUserCard');
+
+		$router->get('users/{id}', 'UserController@getUser');
+		$router->put('users/{id}', 'UserController@putUser');
+		$router->delete('users/{id}', 'UserController@deleteUser');
 
         $router->get('users', function() {
             $users = \App\User::all();
@@ -33,5 +38,4 @@ $router->post(
     ]
 );
 
-$router->post('user', 'UserController@createUser');
-$router->get('user', 'UserController@phpinf');
+$router->post('users', 'UserController@createUser');

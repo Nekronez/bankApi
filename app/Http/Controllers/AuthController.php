@@ -44,10 +44,10 @@ class AuthController extends BaseController
         // As you can see we are passing `JWT_SECRET` as the second parameter that will 
         // be used to decode the token in the future.
         return JWT::encode($payload, env('JWT_SECRET'));
-    } 
+    }
     /**
      * Authenticate a user and return the token if the provided credentials are correct.
-     * 
+     *
      * @param  \App\User   $user 
      * @return mixed
      */
@@ -57,7 +57,6 @@ class AuthController extends BaseController
             'password'  => 'required'
         ]);
 
-Log::info('1Showing user: ');
         // Find the user by phone
         $user = User::where('phone', $this->request->input('phone'))->first();
         if (!$user) {

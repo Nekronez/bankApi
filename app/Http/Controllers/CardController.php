@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -23,7 +22,7 @@ class CardController extends Controller
     {
 //	var_dump($request);
 
-        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+    $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
 
 	$validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -62,8 +61,31 @@ class CardController extends Controller
             return response(json_encode($data), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
-            return response(json_encode($data), 500)//->json($data)
-		             ->header('Content-Type', 'application/json; charset=utf-8');//(var_dump($data), 500, $headers);
+            return response(json_encode($data), 500)
+		             ->header('Content-Type', 'application/json; charset=utf-8');
         }
     }
+
+	public function getUserCard(Request $request, $id, $userId)
+	{
+	    $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+		try
+		{
+			$card = DB::table('card')
+					->where([
+						['userId','=',$userId],
+						['id','=',$id],
+					])
+					->get();
+			return response(json_encode($card), 200, $headers);
+		}
+		catch (\Exception $e)
+		{
+			$data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
+            return response(json_encode($data), 500)
+                     ->header('Content-Type', 'application/json; charset=utf-8');
+
+		}
+	}
 }
