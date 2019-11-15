@@ -17,25 +17,10 @@ $router->get('/', function () use ($router) {
 
 $router->group(['middleware' => 'jwt.auth'], function() use ($router) 
     {
-        $router->post('card', 'CardController@createCard');
-		$router->get('users/{userId}/cards/{id}', 'CardController@getUserCard');
-
-		$router->get('users/{id}', 'UserController@getUser');
-		$router->put('users/{id}', 'UserController@putUser');
-		$router->delete('users/{id}', 'UserController@deleteUser');
-
-        $router->get('users', function() {
-            $users = \App\User::all();
-            return response()->json($users);
-        });
+        $router->get('users/accounts', 'UserController@getUserAccounts');
+        $router->get('users/cards', 'UserController@getUserCards');
+        $router->post('users', 'UserController@createUser');
     }
 );
 
-$router->post(
-    'auth/login',
-    [
-       'uses' => 'AuthController@authenticate'
-    ]
-);
-
-$router->post('users', 'UserController@createUser');
+$router->post('auth/login',['uses' => 'AuthController@authenticate']);

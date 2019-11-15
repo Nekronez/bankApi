@@ -22,14 +22,12 @@ class UserController extends Controller
 
     public function createUser(Request $request)
     {
-//	var_dump($request);
-
 	    $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
 
 		$validator = Validator::make($request->all(), [
-	    	'name' => 'required',
+	    	'firstName' => 'required',
 	    	'lastName' => 'required',
-	    	'secondName' => 'required',
+	    	'middleName' => 'required',
 	        'phone' => 'required|size:11',
 		    'password' => 'required',
 	    ]);
@@ -47,7 +45,8 @@ class UserController extends Controller
 		    $user->password = password_hash($request->password, PASSWORD_DEFAULT );
 
 		    $phoneCheck = User::where('phone', $user->phone)
-								->count();
+                                ->count();
+
 		    if($phoneCheck > 0) {
 				$data = ["errorMessage" => "This phone is already in the database"];
 	            return response(json_encode($data), 400, $headers);
@@ -59,8 +58,43 @@ class UserController extends Controller
 	        $data = ["errorMessage" => "Server error: ".$e->getMessage()];
 	        return response(json_encode($data), 500, $headers);
 	    }
-	}
+    }
+    
+    public function getUserAccounts(Request $request)
+    {
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
 
+        $userId = $request->auth->id;
+
+        try{
+            $accounts = User::find($userId)->accounts;
+            return response(json_encode($accounts), 200, $headers);
+        } catch (\Exception $e) {
+            $data = ["errorMessage" => "Server error: ".$e->getMessage()];
+            return response(json_encode($data), 500, $headers);
+        }
+    }
+
+    public function getUserCards(Request $request)
+    {
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+        $userId = $request->auth->id;
+
+        try{
+            $accounts = User::find($userId)->accounts;
+            
+            foreach ($accounts as $account) {
+                $cards[] = $account->cards;
+            }
+            return response(json_encode($cards), 200, $headers);
+        } catch (\Exception $e) {
+            $data = ["errorMessage" => "Server error: ".$e->getMessage()];
+            return response(json_encode($data), 500, $headers);
+        }
+    }
+
+    /*
     public function getUser(Request $request, $id)
     {
 		$headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
@@ -138,5 +172,7 @@ class UserController extends Controller
             $data = ["errorMessage" => "Unknown error: ".$e->getMessage()];
             return response(json_encode($data), 500, $headers);
         }
-	}
+    }
+    */
+    
 }

@@ -1,5 +1,5 @@
 <?php
-//test
+
 namespace App;
 
 use Illuminate\Auth\Authenticatable;
@@ -22,6 +22,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $fillable = [
         'name', 'lastName', 'secondName', 'phone',
     ];
+
+    public function accounts()
+    {
+        return $this->hasMany('App\Account');
+    }
 
     /**
      * The attributes excluded from the model's JSON form.

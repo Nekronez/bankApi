@@ -6,11 +6,12 @@ use Exception;
 use App\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
+use Log;
 class JwtMiddleware
 {
     public function handle($request, Closure $next, $guard = null)
     {
-        $token = $request->get('token');
+        $token = explode(' ', $request->header('Authorization'))[1];
 
         if(!$token) {
             // Unauthorized response if token not there

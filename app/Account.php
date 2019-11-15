@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 
-class Card extends Model implements AuthenticatableContract, AuthorizableContract
+class Account extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
 
@@ -18,15 +18,20 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'panNumber', 'name', 'expireDate', 'cardHolderName', 'activationDate',
+        'numberAccount', 'rate', 'balance',
     ];
+
+    public function cards()
+    {
+        return $this->hasMany('App\Card');
+    }
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = [
-        'cvv',
-    ];
+    // protected $hidden = [
+    //     '',
+    // ];
 }

@@ -20,24 +20,22 @@ class CardController extends Controller
 
     public function createCard(Request $request)
     {
-//	var_dump($request);
+		$headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
 
-    $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+		$validator = Validator::make($request->all(), [
+				'name' => 'required',
+				'userId' => 'required',
+				'paymentSystem' => 'required',
+				'type' => 'required',
+				'pinCode' => 'required',
+			]);
 
-	$validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'userId' => 'required',
-	    'paymentSystem' => 'required',
-	    'type' => 'required',
-	    'pinCode' => 'required',
-        ]);
+		if ($validator->fails()) {
+				return response()->json($validator->errors(), 400);
+		}
 
-	if ($validator->fails()) {
-    	    return response()->json($validator->errors(), 400);
-	}
-
-	try{
-	    $id = rand(1111, 9999)." ".rand(1111, 9999)." ".rand(1111, 9999)." ".rand(1111, 9999);
+		try{
+	    	$id = rand(1111, 9999)." ".rand(1111, 9999)." ".rand(1111, 9999)." ".rand(1111, 9999);
             $name = $request->name;
             $userId = $request->userId;
             $paymentSystem = $request->paymentSystem;
@@ -48,12 +46,12 @@ class CardController extends Controller
             DB::table('card')->insert(
             	[
       	            'id' => $id,
-		    'name' => $name,
-		    'balance' => $balance,
+					'name' => $name,
+					'balance' => $balance,
             	    'userId' => $userId,
-          	    'paymentSystem' => $paymentSystem,
-        	    'type' => $type,
-	            'pinCode' => $pinCode,
+					'paymentSystem' => $paymentSystem,
+					'type' => $type,
+					'pinCode' => $pinCode,
                 ]
 	    );
 

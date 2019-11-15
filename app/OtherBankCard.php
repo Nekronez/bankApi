@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 
-class Card extends Model implements AuthenticatableContract, AuthorizableContract
+class OtherBankCard extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
 
@@ -18,7 +18,7 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'panNumber', 'name', 'expireDate', 'cardHolderName', 'activationDate',
+        'panNumber', 'expireDate', 'name',
     ];
 
     /**
@@ -26,7 +26,7 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var array
      */
-    protected $hidden = [
-        'cvv',
-    ];
+    // protected $hidden = [
+    //     '',
+    // ];
 }

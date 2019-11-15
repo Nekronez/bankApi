@@ -50,25 +50,26 @@ class Handler extends ExceptionHandler
     {
 		$parentRender = parent::render($request, $e);
         Log::info('ERRORmessage: '.$e );
+        Log::info('Request: '.$request );
 
 
-	// if parent returns a JsonResponse
-   	// for example in case of a ValidationException
-   	if ($parentRender instanceof JsonResponse)
-	{
-            return $parentRender;
+        // if parent returns a JsonResponse
+        // for example in case of a ValidationException
+        if ($parentRender instanceof JsonResponse)
+        {
+                return $parentRender;
+            }
+
+        $eMessage="";
+        switch ($parentRender->status()){
+            case 405:
+            $eMessage="Method not allowed";
+            break;
+            case 404:
+            $eMessage="Not found";
+                    break;
         }
-
-	$eMessage="";
-	switch ($parentRender->status()){
-	    case 405:
-		$eMessage="Method not allowed";
-		break;
-	    case 404:
-		$eMessage="Not found";
-                break;
-
-	}
+        
         return new JsonResponse([
             'errorMessage' => $e instanceof HttpException
                 ? $e->getMessage().$eMessage
