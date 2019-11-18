@@ -25,6 +25,8 @@ class OtherBankCardPicture extends Model implements AuthenticatableContract, Aut
     {
         return $this->hasMany('App\OtherBankCard');
     }
+
+    protected $table = 'otherBankCardPictures';
     
     /**
      * The attributes excluded from the model's JSON form.

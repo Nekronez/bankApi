@@ -20,6 +20,8 @@ class CardPicture extends Model implements AuthenticatableContract, Authorizable
     protected $fillable = [
         'name',
     ];
+
+    protected $table = 'cardPictures';
     
     public function tariffs()
     {

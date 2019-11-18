@@ -20,8 +20,17 @@ class Account extends Model implements AuthenticatableContract, AuthorizableCont
     protected $fillable = [
         'numberAccount', 'rate', 'balance',
     ];
-    protected $primaryKey = 'id';
 
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'currency_id', 'type_account_id', 'user_id'
+    ];
+
+    
     public function cards()
     {
         return $this->hasMany('App\Card');
@@ -29,15 +38,11 @@ class Account extends Model implements AuthenticatableContract, AuthorizableCont
 
     public function currency()
     {
-        return $this->morphOne('App\Currency', 'currency');
+        return $this->belongsTo('App\Currency');
     }
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    // protected $hidden = [
-    //     '',
-    // ];
+    public function typeAccount()
+    {
+        return $this->belongsTo('App\TypeAccount');
+    }
 }

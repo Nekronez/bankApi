@@ -26,6 +26,8 @@ class StatusCard extends Model implements AuthenticatableContract, AuthorizableC
         return $this->hasMany('App\Card');
     }
 
+    protected $table = 'statusCards';
+
     /**
      * The attributes excluded from the model's JSON form.
      *

@@ -26,6 +26,8 @@ class PaymentSystem extends Model implements AuthenticatableContract, Authorizab
         return $this->hasMany('App\Tariff');
     }
 
+    protected $table = 'paymentSystems';
+
     /**
      * The attributes excluded from the model's JSON form.
      *

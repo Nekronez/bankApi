@@ -21,6 +21,8 @@ class TypeAccount extends Model implements AuthenticatableContract, Authorizable
         'name',
     ];
 
+    protected $table = 'typeAccounts';
+
     /**
      * The attributes excluded from the model's JSON form.
      *

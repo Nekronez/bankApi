@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB as DB;
 use Illuminate\Support\Facades\Validator;
 use \App\User;
 use \App\Currency;
+use \App\Account;
+use \App\Card;
 use Log;
 
 class UserController extends Controller
@@ -67,13 +69,7 @@ class UserController extends Controller
         $userId = $request->auth->id;
 
         try{
-            $accounts = User::find($userId)->accounts;
-            // foreach ($accounts as $account) {
-            //     //$currency = Currency::find($account['currency_id']);
-            //     $account['currency_id'] = $account['currency'];
-            //     unset($account['currency_id']);
-            //     $account['currency'] = $account->currency;//$currency();
-            // }
+            $accounts = Account::with(['currency', 'typeAccount'])->where('user_id', '=', $userId)->get();
             return response(json_encode($accounts), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
@@ -88,11 +84,15 @@ class UserController extends Controller
         $userId = $request->auth->id;
 
         try{
-            $accounts = User::find($userId)->accounts;
+            $accounts = Account::where('user_id', '=', $userId)->get();
+            $cards = Card::with('statusCard')->get();
             
-            foreach ($accounts as $account) {
-                $cards[] = $account->cards;
-            }
+            // ->whereIn('account_id', $accounts['id'])
+
+            // $accounts = User::find($userId)->accounts;
+            // foreach ($accounts as $account) {
+            //     $cards[] = $account->cards;
+            // }
             return response(json_encode($cards), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];

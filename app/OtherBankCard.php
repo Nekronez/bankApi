@@ -21,6 +21,8 @@ class OtherBankCard extends Model implements AuthenticatableContract, Authorizab
         'panNumber', 'expireDate', 'name',
     ];
 
+    protected $table = 'otherBankCards';
+
     /**
      * The attributes excluded from the model's JSON form.
      *

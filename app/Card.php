@@ -27,6 +27,11 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'cvv',
+        'cvv', 'account_id', 'status_card_id', 'tariff_id'
     ];
+
+    public function statusCard()
+    {
+        return $this->belongsTo('App\StatusCard');
+    }
 }
