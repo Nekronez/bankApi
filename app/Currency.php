@@ -20,10 +20,11 @@ class Currency extends Model implements AuthenticatableContract, AuthorizableCon
     protected $fillable = [
         'name',
     ];
+    protected $primaryKey = 'id';
 
-    public function accounts()
+    public function currency()
     {
-        return $this->hasMany('App\Card');
+        return $this->morphTo();
     }
 
     /**

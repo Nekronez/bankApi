@@ -20,10 +20,16 @@ class Account extends Model implements AuthenticatableContract, AuthorizableCont
     protected $fillable = [
         'numberAccount', 'rate', 'balance',
     ];
+    protected $primaryKey = 'id';
 
     public function cards()
     {
         return $this->hasMany('App\Card');
+    }
+
+    public function currency()
+    {
+        return $this->morphOne('App\Currency', 'currency');
     }
 
     /**

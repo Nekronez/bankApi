@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as DB;
 use Illuminate\Support\Facades\Validator;
 use \App\User;
+use \App\Currency;
 use Log;
 
 class UserController extends Controller
@@ -63,11 +64,16 @@ class UserController extends Controller
     public function getUserAccounts(Request $request)
     {
         $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
-
         $userId = $request->auth->id;
 
         try{
             $accounts = User::find($userId)->accounts;
+            // foreach ($accounts as $account) {
+            //     //$currency = Currency::find($account['currency_id']);
+            //     $account['currency_id'] = $account['currency'];
+            //     unset($account['currency_id']);
+            //     $account['currency'] = $account->currency;//$currency();
+            // }
             return response(json_encode($accounts), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
