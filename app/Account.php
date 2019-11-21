@@ -18,7 +18,7 @@ class Account extends Model implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $fillable = [
-        'numberAccount', 'rate', 'balance',
+        'number_account', 'rate', 'balance',
     ];
 
     /**

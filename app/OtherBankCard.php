@@ -28,7 +28,12 @@ class OtherBankCard extends Model implements AuthenticatableContract, Authorizab
      *
      * @var array
      */
-    // protected $hidden = [
-    //     '',
-    // ];
+    protected $hidden = [
+        'cvv', 'user_id', 'other_bank_card_picture_id',
+    ];
+
+    public function otherBankCardPicture()
+    {
+        return $this->belongsTo('App\OtherBankCardPicture');
+    }
 }

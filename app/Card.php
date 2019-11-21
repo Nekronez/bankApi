@@ -34,4 +34,9 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsTo('App\StatusCard');
     }
+
+    public function account()
+    {
+        return $this->belongsTo('App\Account');
+    }
 }

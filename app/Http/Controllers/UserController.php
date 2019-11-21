@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Builder;
 use \App\User;
 use \App\Currency;
 use \App\Account;
 use \App\Card;
+use \App\OtherBankCard;
+use App\Http\Resources\Account as AccountResource;
 use Log;
 
 class UserController extends Controller
@@ -43,7 +46,7 @@ class UserController extends Controller
 			$user = new User;
 	 		$user->name = $request->name;
 	 		$user->lastName = $request->lastName;
-	 		$user->secondName = $request->secondName;
+	 		$user->middleName = $request->middleName;
 	        $user->phone = $request->phone;
 		    $user->password = password_hash($request->password, PASSWORD_DEFAULT );
 
@@ -52,14 +55,14 @@ class UserController extends Controller
 
 		    if($phoneCheck > 0) {
 				$data = ["errorMessage" => "This phone is already in the database"];
-	            return response(json_encode($data), 400, $headers);
+	            return response($data->toJson(), 400, $headers);
 		    }
 
             $user->save();
-    	    return response(json_encode($user), 200, $headers);
+    	    return response($user->toJson(), 200, $headers);
 		} catch (\Exception $e) {
 	        $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-	        return response(json_encode($data), 500, $headers);
+	        return response($data->toJson(), 500, $headers);
 	    }
     }
     
@@ -70,10 +73,10 @@ class UserController extends Controller
 
         try{
             $accounts = Account::with(['currency', 'typeAccount'])->where('user_id', '=', $userId)->get();
-            return response(json_encode($accounts), 200, $headers);
+            return response(new AccountResource($accounts), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-            return response(json_encode($data), 500, $headers);
+            return response($data->toJson(), 500, $headers);
         }
     }
 
@@ -84,19 +87,29 @@ class UserController extends Controller
         $userId = $request->auth->id;
 
         try{
-            $accounts = Account::where('user_id', '=', $userId)->get();
-            $cards = Card::with('statusCard')->get();
-            
-            // ->whereIn('account_id', $accounts['id'])
+            $accountsId = Account::select('id')->where('user_id', $userId)->get()->toArray();
+            $cards = Card::with('statusCard')->whereIn('account_id', $accountsId)->get();
 
-            // $accounts = User::find($userId)->accounts;
-            // foreach ($accounts as $account) {
-            //     $cards[] = $account->cards;
-            // }
-            return response(json_encode($cards), 200, $headers);
+            return response($cards->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-            return response(json_encode($data), 500, $headers);
+            return response($data->toJson(), 500, $headers);
+        }
+    }
+
+    public function getUserOtherBankCards(Request $request)
+    {
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+        $userId = $request->auth->id;
+
+        try{
+            $otherCards = OtherBankCard::with('otherBankCardPicture')->where('user_id', $userId)->get();
+
+            return response($otherCards->toJson(), 200, $headers);
+        } catch (\Exception $e) {
+            $data = ["errorMessage" => "Server error: ".$e->getMessage()];
+            return response($data->toJson(), 500, $headers);
         }
     }
 

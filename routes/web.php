@@ -20,6 +20,7 @@ $router->group(['middleware' => 'jwt.auth'], function() use ($router)
         $router->get('users/accounts', 'UserController@getUserAccounts');
         $router->get('users/cards', 'UserController@getUserCards');
         $router->post('users', 'UserController@createUser');
+        $router->get('users/othercards', 'UserController@getUserOtherBankCards');
     }
 );
 
