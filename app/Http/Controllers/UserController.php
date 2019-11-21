@@ -11,7 +11,6 @@ use \App\Currency;
 use \App\Account;
 use \App\Card;
 use \App\OtherBankCard;
-use App\Http\Resources\Account as AccountResource;
 use Log;
 
 class UserController extends Controller
@@ -73,7 +72,7 @@ class UserController extends Controller
 
         try{
             $accounts = Account::with(['currency', 'typeAccount'])->where('user_id', '=', $userId)->get();
-            return response(new AccountResource($accounts), 200, $headers);
+            return response($accounts->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
             return response($data->toJson(), 500, $headers);

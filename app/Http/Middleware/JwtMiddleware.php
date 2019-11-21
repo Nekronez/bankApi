@@ -12,7 +12,6 @@ class JwtMiddleware
     public function handle($request, Closure $next, $guard = null)
     {
         $token = explode(' ', $request->header('Authorization'))[1];
-        Log::info('token: '.$token);
 
         if(!$token) {
             // Unauthorized response if token not there
@@ -27,7 +26,6 @@ class JwtMiddleware
                 'error' => 'Provided token is expired.'
             ], 400);
         } catch(Exception $e) {
-            Log::info('ERRORmessage: '.$e);
             return response()->json([
                 'error' => 'An error while decoding token.'
             ], 400);

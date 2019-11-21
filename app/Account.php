@@ -7,6 +7,8 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Support\Str;
+use Log;
 
 class Account extends Model implements AuthenticatableContract, AuthorizableContract
 {
@@ -45,4 +47,14 @@ class Account extends Model implements AuthenticatableContract, AuthorizableCont
     {
         return $this->belongsTo('App\TypeAccount');
     }
+
+    // public function toArray(){
+    //     $array = parent::toArray();
+    //     Log::info('toarray: '.json_encode($array) );
+    //     $camelArray = array();
+    //     foreach($array as $name => $value){
+    //         $camelArray[Str::camel($name)] = $value;
+    //     }
+    //     return $camelArray;
+    // }
 }
