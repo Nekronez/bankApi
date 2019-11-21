@@ -43,9 +43,9 @@ class UserController extends Controller
 
 		try{
 			$user = new User;
-	 		$user->name = $request->name;
-	 		$user->lastName = $request->lastName;
-	 		$user->middleName = $request->middleName;
+	 		$user->first_name = $request->firstName;
+	 		$user->last_name = $request->lastName;
+	 		$user->middle_name = $request->middleName;
 	        $user->phone = $request->phone;
 		    $user->password = password_hash($request->password, PASSWORD_DEFAULT );
 
@@ -54,14 +54,14 @@ class UserController extends Controller
 
 		    if($phoneCheck > 0) {
 				$data = ["errorMessage" => "This phone is already in the database"];
-	            return response($data->toJson(), 400, $headers);
+	            return response($data, 400, $headers);
 		    }
 
             $user->save();
-    	    return response($user->toJson(), 200, $headers);
+    	    return response($user->toJson(), 201, $headers);
 		} catch (\Exception $e) {
 	        $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-	        return response($data->toJson(), 500, $headers);
+	        return response($data, 500, $headers);
 	    }
     }
     
@@ -75,7 +75,7 @@ class UserController extends Controller
             return response($accounts->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-            return response($data->toJson(), 500, $headers);
+            return response($data, 500, $headers);
         }
     }
 
@@ -92,7 +92,7 @@ class UserController extends Controller
             return response($cards->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-            return response($data->toJson(), 500, $headers);
+            return response($data, 500, $headers);
         }
     }
 
@@ -108,7 +108,7 @@ class UserController extends Controller
             return response($otherCards->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
-            return response($data->toJson(), 500, $headers);
+            return response($data, 500, $headers);
         }
     }
 

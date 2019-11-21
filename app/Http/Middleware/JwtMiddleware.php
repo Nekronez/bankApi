@@ -11,7 +11,14 @@ class JwtMiddleware
 {
     public function handle($request, Closure $next, $guard = null)
     {
-        $token = explode(' ', $request->header('Authorization'))[1];
+        $arrayAuthorization = explode(' ', $request->header('Authorization'));
+        if(count($arrayAuthorization) != 2){
+            return response()->json([
+                'error' => 'Token not provided.'
+            ], 401);
+        }
+        
+        $token = $arrayAuthorization[1];
 
         if(!$token) {
             // Unauthorized response if token not there
