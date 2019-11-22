@@ -75,7 +75,7 @@ class UserController extends Controller
                                 ->where('user_id', '=', $userId)
                                 ->get();
             
-            return response($accounts->toJson(), 200, $headers);
+            return response()->json($accounts, 200, [], JSON_NUMERIC_CHECK);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
             return response($data, 500, $headers);
