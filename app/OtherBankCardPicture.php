@@ -26,6 +26,11 @@ class OtherBankCardPicture extends Model implements AuthenticatableContract, Aut
         return $this->hasMany('App\OtherBankCard');
     }
 
+    public function cardPicture()
+    {
+        return $this->belongsTo('App\CardPicture');
+    }
+
     protected $table = 'otherBankCardPictures';
     
     /**

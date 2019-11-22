@@ -20,7 +20,6 @@ class Currency extends Model implements AuthenticatableContract, AuthorizableCon
     protected $fillable = [
         'name',
     ];
-    protected $primaryKey = 'id';
 
     public function currency()
     {

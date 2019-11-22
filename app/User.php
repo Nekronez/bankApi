@@ -28,6 +28,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->hasMany('App\Account');
     }
 
+    public function otherBankCards()
+    {
+        return $this->hasMany('App\OtherBankCard');
+    }
+
     /**
      * The attributes excluded from the model's JSON form.
      *

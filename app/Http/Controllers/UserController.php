@@ -54,7 +54,7 @@ class UserController extends Controller
 
 		    if($phoneCheck > 0) {
 				$data = ["errorMessage" => "This phone is already in the database"];
-	            return response($data, 400, $headers);
+	            return response($data, 409, $headers);
 		    }
 
             $user->save();
@@ -69,9 +69,12 @@ class UserController extends Controller
     {
         $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
         $userId = $request->auth->id;
-
+        
         try{
-            $accounts = Account::with(['currency', 'typeAccount'])->where('user_id', '=', $userId)->get();
+            $accounts = Account::with(['currency', 'typeAccount'])
+                                ->where('user_id', '=', $userId)
+                                ->get();
+            
             return response($accounts->toJson(), 200, $headers);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
@@ -86,8 +89,11 @@ class UserController extends Controller
         $userId = $request->auth->id;
 
         try{
-            $accountsId = Account::select('id')->where('user_id', $userId)->get()->toArray();
-            $cards = Card::with('statusCard')->whereIn('account_id', $accountsId)->get();
+            $cards = Card::with('statusCard')
+                        ->join('accounts', 'cards.account_id', '=', 'accounts.id')
+                        ->join('tariffs', 'cards.tariff_id', '=', 'tariffs.id')
+                        ->join('cardPictures', 'tariffs.card_picture_id', '=', 'cardPictures.id')
+                        ->get(['cards.*', 'url as imageUrl']);
 
             return response($cards->toJson(), 200, $headers);
         } catch (\Exception $e) {
@@ -103,7 +109,10 @@ class UserController extends Controller
         $userId = $request->auth->id;
 
         try{
-            $otherCards = OtherBankCard::with('otherBankCardPicture')->where('user_id', $userId)->get();
+            $otherCards = OtherBankCard::join('otherBankCardPictures', "otherBankCards.other_bank_card_picture_id", "=", "otherBankCardPictures.id")
+                                        ->join('cardPictures', "otherBankCardPictures.card_picture_id", "=", "cardPictures.id")
+                                        ->where('user_id', $userId)
+                                        ->get(['otherBankCards.*', 'url as imageUrl']);
 
             return response($otherCards->toJson(), 200, $headers);
         } catch (\Exception $e) {

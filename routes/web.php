@@ -18,9 +18,9 @@ $router->get('/', function () use ($router) {
 $router->group(['middleware' => 'jwt.auth'], function() use ($router) 
     {
         $router->post('users', 'UserController@createUser');
-        $router->get('users/accounts', 'UserController@getUserAccounts');
-        $router->get('users/cards', 'UserController@getUserCards');
-        $router->get('users/othercards', 'UserController@getUserOtherBankCards');
+        $router->get('products/accounts', 'UserController@getUserAccounts');
+        $router->get('products/cards', 'UserController@getUserCards');
+        $router->get('othercards', 'UserController@getUserOtherBankCards');
     }
 );
 

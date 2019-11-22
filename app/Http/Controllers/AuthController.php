@@ -38,7 +38,7 @@ class AuthController extends BaseController
             'iss' => "lumen-jwt", // Issuer of the token
             'sub' => $user->id, // Subject of the token
             'iat' => time(), // Time when JWT was issued.
-            'exp' => time() + 60*60 // Expiration time
+            'exp' => time() + 60*60*200 // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will 
@@ -62,7 +62,7 @@ class AuthController extends BaseController
         if (!$user) {
             return response()->json([
                 'error' => 'Phone does not exist.'
-            ], 400);
+            ], 404);
         }
         // Verify the password and generate the token
         if (Hash::check($this->request->input('password'), $user->password)) {
@@ -70,9 +70,9 @@ class AuthController extends BaseController
                 'token' => $this->jwt($user)
             ], 200);
         }
-        // Bad Request response
+
         return response()->json([
             'error' => 'Phone or password is wrong.'
-        ], 400);
+        ], 401);
     }
 }
