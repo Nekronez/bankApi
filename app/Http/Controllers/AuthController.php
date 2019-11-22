@@ -53,17 +53,36 @@ class AuthController extends BaseController
      */
     public function authenticate(User $user) {
         $this->validate($this->request, [
-            'phone'     => 'required',
+            'kind'     => 'required',
+            'value'     => 'required',
             'password'  => 'required'
         ]);
 
-        // Find the user by phone
-        $user = User::where('phone', $this->request->input('phone'))->first();
-        if (!$user) {
+        if($this->request->input('kind') == 'phone'){
+            // Find the user by phone
+            $user = User::where('phone', $this->request->input('value'))->first();
+            if (!$user) {
+                return response()->json([
+                    'errorMessage' => 'Phone does not exist.'
+                ], 404);
+            }
+        } else if($this->request->kind == 'pan'){
+            // Find the user by cardNumber
+            $user = User::join('accounts', 'userёs.id', '=', 'accounts.user_id')
+                        ->join('cards', 'accounts.id', '=', 'cards.account_id')
+                        ->where('cards.pan', $this->request->input('value'))->first();
+
+            if (!$user) {
+                return response()->json([
+                    'errorMessage' => 'Phone does not exist.'
+                ], 404);
+            }
+        }else{
             return response()->json([
-                'error' => 'Phone does not exist.'
-            ], 404);
+                'errorMessage' => 'Unknown data type.'
+            ], 400);
         }
+        
         // Verify the password and generate the token
         if (Hash::check($this->request->input('password'), $user->password)) {
             return response()->json([
@@ -72,7 +91,7 @@ class AuthController extends BaseController
         }
 
         return response()->json([
-            'error' => 'Phone or password is wrong.'
+            'errorMessage' => 'Phone or password is wrong.'
         ], 401);
     }
 }

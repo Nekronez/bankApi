@@ -34,7 +34,7 @@ class JwtMiddleware
             ], 401);
         } catch(Exception $e) {
             return response()->json([
-                'error' => 'An error while decoding token.'
+                'error' => 'Invalid token provided.'
             ], 401);
         }
         $user = User::find($credentials->sub);

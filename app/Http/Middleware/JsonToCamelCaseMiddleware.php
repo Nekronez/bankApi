@@ -20,8 +20,10 @@ class JsonToCamelCaseMiddleware
         $response = $next($request);
 
         $array = json_decode($response->content(),true);
-        $array = $this->convertKeysToCamelCase($array);
-        $response->setContent(json_encode($array));
+        if(is_array($array)==true){
+            $array = $this->convertKeysToLoverCamelCase($array);
+            $response->setContent(json_encode($array));
+        }
         
         return $response;
     }
@@ -32,14 +34,14 @@ class JsonToCamelCaseMiddleware
      * @param  array()  $apiResponseArray
      * @return array()
      */
-    private function convertKeysToCamelCase($apiResponseArray)
+    private function convertKeysToLoverCamelCase($apiResponseArray)
     {
         $arr = [];
         foreach ($apiResponseArray as $key => $value) {
             $key = Str::camel($key);
 
             if (is_array($value))
-                $value = $this->convertKeysToCamelCase($value);
+                $value = $this->convertKeysToLoverCamelCase($value);
 
             $arr[$key] = $value;
         }
