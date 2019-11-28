@@ -59,6 +59,7 @@ $app->singleton(
 
 $app->routeMiddleware([
     'jwt.auth' => App\Http\Middleware\JwtMiddleware::class,
+    'throttle' => App\Http\Middleware\ThrottleRequests::class,
 ]);
 
 $app->middleware([

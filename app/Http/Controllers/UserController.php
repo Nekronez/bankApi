@@ -6,11 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Hash;
 use \App\User;
 use \App\Currency;
 use \App\Account;
 use \App\Card;
 use \App\OtherBankCard;
+use \App\PinCode;
+use \App\PinCodeHistory;
 use Log;
 
 class UserController extends Controller
@@ -34,7 +37,7 @@ class UserController extends Controller
 	    	'lastName' => 'required',
 	    	'middleName' => 'required',
 	        'phone' => 'required|size:11',
-		    'password' => 'required',
+		    'pinCode' => 'required',
 	    ]);
 
 		if ($validator->fails()) {
@@ -47,7 +50,7 @@ class UserController extends Controller
 	 		$user->last_name = $request->lastName;
 	 		$user->middle_name = $request->middleName;
 	        $user->phone = $request->phone;
-		    $user->password = password_hash($request->password, PASSWORD_DEFAULT );
+		    $user->pin_code_id = null;
 
 		    $phoneCheck = User::where('phone', $user->phone)
                                 ->count();
@@ -58,6 +61,15 @@ class UserController extends Controller
 		    }
 
             $user->save();
+
+            $pinCode = new PinCode;
+            $pinCode->user_id = $user->id;
+            $pinCode->value = password_hash($request->pinCode, PASSWORD_DEFAULT);
+            $pinCode->save();
+
+            $user->pin_code_id = $pinCode->id;
+            $user->save();
+            
     	    return response($user->toJson(), 201, $headers);
 		} catch (\Exception $e) {
 	        $data = ["errorMessage" => "Server error: ".$e->getMessage()];
@@ -65,6 +77,39 @@ class UserController extends Controller
 	    }
     }
     
+    public function putUserPassword(Request $request)
+    {
+        $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];
+
+		$validator = Validator::make($request->all(), [
+		    'pinCode' => 'required|size:5',
+        ]);
+        
+        try{
+            $pinCode = $request->auth->pinCode;
+
+            // if(Hash::check($request->pinCode, $pinCode->value)){
+            //     return response()->json([
+            //         'errorMessage' => 'User has the same password.'
+            //     ], 400);
+            // }
+
+            $pinCode->value = password_hash($request->pinCode, PASSWORD_DEFAULT );
+            $pinCode->save();
+
+            $pinCodeHistory = new PinCodeHistory;
+            $pinCodeHistory->value = $pinCode->value;
+            $pinCodeHistory->user_id = $pinCode->user_id;
+            $pinCodeHistory->save();
+
+
+            return response()->json([], 204, [], JSON_NUMERIC_CHECK);
+        } catch (\Exception $e) {
+            $data = ["errorMessage" => "Server error: ".$e->getMessage()];
+            return response($data, 500, $headers);
+        }
+    }
+
     public function getUserAccounts(Request $request)
     {
         $headers = ['Content-Type' => 'application/json', 'charset'=>'utf8'];

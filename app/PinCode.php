@@ -8,11 +8,9 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class PinCode extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
-    
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -20,28 +18,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'name', 'lastName', 'secondName', 'phone',
+        'value',
     ];
-
-    public function accounts()
-    {
-        return $this->hasMany('App\Account');
-    }
-
-    public function otherBankCards()
-    {
-        return $this->hasMany('App\OtherBankCard');
-    }
-
-    public function statusUser()
-    {
-        return $this->belongsTo('App\StatusUser');
-    }
-
-    public function pinCode()
-    {
-        return $this->hasOne('App\PinCode');
-    }
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -49,6 +27,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'pin_code_id', 'status_user_id'
+        'user_id',
     ];
+
+    public $timestamps = false;
+    protected $table = 'pinCodes';
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }
