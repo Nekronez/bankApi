@@ -29,9 +29,9 @@ $router->group(['middleware' => ['jwt.auth:authorization']], function() use ($ro
 $router->group(['middleware' => 'jwt.auth:session'], function() use ($router) 
     {
         $router->post('auth/login',['uses' => 'AuthController@getAuthorizationToken']);
-        $router->post('auth/checkedsms',['uses' => 'AuthController@checkSMSCode']);
-        $router->post('auth/newsms',['uses' => 'AuthController@sendNewSmsCode']);
+        $router->post('auth/sms/checked',['uses' => 'AuthController@checkSMSCode']);
+        $router->post('auth/smc/sender',['uses' => 'AuthController@sendNewSmsCode']);
     }
 );
 
-$router->post('auth/verified',['uses' => 'AuthController@verification']);
+$router->post('auth',['uses' => 'AuthController@verification']);

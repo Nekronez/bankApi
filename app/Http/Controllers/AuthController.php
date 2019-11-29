@@ -165,7 +165,7 @@ class AuthController extends BaseController
             $smsSession->save();
             return response()->json([
                 'errorMessage' => "Invalide code."
-            ], 400);
+            ], 409);
         }
 
         $smsSession->checked = true;
@@ -180,10 +180,19 @@ class AuthController extends BaseController
      */
     public function sendNewSmsCode() {
         $smsSession = SmsSession::find($this->request->sms);
+        Log::info('date1: '.date('Y-m-d H:i:s', strtotime("+1 minute", strtotime($smsSession->created_at))));
+        Log::info('date2: '.date('Y-m-d H:i:s', time()));
+
+        if(date('Y-m-d H:i:s', strtotime("+1 minutes", strtotime($smsSession->created_at))) > date('Y-m-d H:i:s', time()) ){
+            return response()->json([
+                'errorMessage' => 'This method is temporarily unavailable until '.date('Y-m-d H:i:s', strtotime("+1 minutes", strtotime($smsSession->created_at))),
+            ], 429);
+        }
 
         // Gennerate new sms code
         $smsSession->sms_code = "12345";
         $smsSession->attempts = 0;
+        $smsSession->created_at = date('Y-m-d H:i:s', time());
 
         // Send sms code
         //...
@@ -191,7 +200,7 @@ class AuthController extends BaseController
         // If sms was successfully sent
         $smsSession->save();
 
-        return response()->json([], 204);
+        return response()->json([], 200);
     }
 
     /**
@@ -201,7 +210,7 @@ class AuthController extends BaseController
      */
     public function verification(){
         $this->validate($this->request, [
-            'kind'     => 'required|in:pan,phone',
+            'kind'     => 'required',
             'value'     => 'required',
         ]);
 
@@ -213,7 +222,7 @@ class AuthController extends BaseController
                     'errorMessage' => 'Phone does not exist.'
                 ], 404);
             }
-        } else {
+        } else if ($this->request->input('kind') == 'pan'){
             $user = User::join('accounts', 'users.id', '=', 'accounts.user_id')
                         ->join('cards', 'accounts.id', '=', 'cards.account_id')
                         ->where('cards.pan', $this->request->input('value'))->first();
@@ -223,6 +232,10 @@ class AuthController extends BaseController
                     'errorMessage' => 'PAN does not exist.'
                 ], 404);
             }
+        } else {
+            return response()->json([
+                'errorMessage' => "Invalid kind (may be: 'pan' or 'phone')."
+            ], 400);
         }
 
         // Gennerate sms code

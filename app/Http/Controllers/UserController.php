@@ -103,7 +103,7 @@ class UserController extends Controller
             $pinCodeHistory->save();
 
 
-            return response()->json([], 204, [], JSON_NUMERIC_CHECK);
+            return response()->json([], 200, [], JSON_NUMERIC_CHECK);
         } catch (\Exception $e) {
             $data = ["errorMessage" => "Server error: ".$e->getMessage()];
             return response($data, 500, $headers);
