@@ -64,6 +64,59 @@ class AuthController extends BaseController
     }
 
     /**
+     * Determine the payment system by credit card number.
+     *
+     * @param  string   $number
+     * @return string
+     */
+    protected function GetCardType($number){
+        $types = [
+            'electron' => '/^(4026|417500|4405|4508|4844|4913|4917)/',
+            'interpayment' => '/^636/',
+            'unionpay' => '/^(62|88)/',
+            'discover' => '/^6(?:011|4|5)/',
+            'maestro' => '/^(50|5[6-9]|6)/',
+            'visa' => '/^4/',
+            'mastercard' => '/^(5[1-5]|(?:222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720))/', // [2221-2720]
+            'amex' => '/^3[47]/',
+            'diners' => '/^3(?:0([0-5]|95)|[689])/',
+            'jcb' => '/^(?:2131|1800|(?:352[89]|35[3-8][0-9]))/', // 3528-3589
+            'mir' => '/^220[0-4]/',
+        ];
+        foreach($types as $type => $regexp){
+            if( preg_match($regexp, $number) ){
+                return $type;
+            }
+        }
+    
+        return 'undefined';
+    }
+
+    /**
+     * Determine the payment system by credit card number.
+     *
+     * @param  string   $digit
+     * @return bool
+     */
+    protected function luhnAlgorithm($digit)
+    {
+        $number = strrev(preg_replace('/[^\d]/', '', $digit));
+        $sum = 0;
+        for ($i = 0, $j = strlen($number); $i < $j; $i++) {
+            if (($i % 2) == 0) {
+                $val = $number[$i];
+            } else {
+                $val = $number[$i] * 2;
+                if ($val > 9)  {
+                    $val -= 9;
+                }
+            }
+            $sum += $val;
+        }
+        return (($sum % 10) === 0);
+    }
+
+    /**
      * Authenticate a user and return the token if the provided credentials are correct.
      *
      * @return mixed
@@ -180,8 +233,6 @@ class AuthController extends BaseController
      */
     public function sendNewSmsCode() {
         $smsSession = SmsSession::find($this->request->sms);
-        Log::info('date1: '.date('Y-m-d H:i:s', strtotime("+1 minute", strtotime($smsSession->created_at))));
-        Log::info('date2: '.date('Y-m-d H:i:s', time()));
 
         if(date('Y-m-d H:i:s', strtotime("+1 minutes", strtotime($smsSession->created_at))) > date('Y-m-d H:i:s', time()) ){
             return response()->json([
@@ -216,13 +267,26 @@ class AuthController extends BaseController
 
         // Find user by value
         if($this->request->input('kind') == 'phone'){
+            if(!preg_match("/^[0-9]{10,10}+$/", $user->phone)){
+                return response()->json([
+                    'errorMessage' => 'Wrong phone format'
+                ], 404);
+            }
+
             $user = User::where('phone', $this->request->input('value'))->first();
+
             if (!$user) {
                 return response()->json([
                     'errorMessage' => 'Phone does not exist.'
                 ], 404);
             }
         } else if ($this->request->input('kind') == 'pan'){
+            if(GetCardType($this->request->input('value')) == 'undefined' || !luhnAlgorithm()){
+                return response()->json([
+                    'errorMessage' => 'Wrong pan format'
+                ], 404);
+            }
+
             $user = User::join('accounts', 'users.id', '=', 'accounts.user_id')
                         ->join('cards', 'accounts.id', '=', 'cards.account_id')
                         ->where('cards.pan', $this->request->input('value'))->first();

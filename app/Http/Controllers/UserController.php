@@ -50,7 +50,7 @@ class UserController extends Controller
 	 		$user->last_name = $request->lastName;
 	 		$user->middle_name = $request->middleName;
 	        $user->phone = $request->phone;
-		    $user->pin_code_id = null;
+            $user->pin_code_id = null;
 
 		    $phoneCheck = User::where('phone', $user->phone)
                                 ->count();
@@ -142,6 +142,7 @@ class UserController extends Controller
                         ->join('accounts', 'cards.account_id', '=', 'accounts.id')
                         ->join('tariffs', 'cards.tariff_id', '=', 'tariffs.id')
                         ->join('cardPictures', 'tariffs.card_picture_id', '=', 'cardPictures.id')
+                        ->where('user_id', $userId)
                         ->get(['cards.*', 'url as imageUrl']);
 
             return response($cards->toJson(), 200, $headers);

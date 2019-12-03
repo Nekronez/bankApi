@@ -18,7 +18,7 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'panNumber', 'name', 'expireDate', 'cardHolderName', 'activationDate',
+        'pan', 'name', 'expire_date', 'card_holder_name', 'activation_date', 'priority_card', 'online_shopping', 'overseas_purchases', 'withdraw_cash',
     ];
 
     /**
@@ -27,8 +27,13 @@ class Card extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'cvv', 'account_id', 'status_card_id', 'tariff_id'
+        'cvv', 'account_id', 'status_card_id', 'tariff_id', 
     ];
+
+    public function getPanAttribute($value)
+    {
+        return substr($value, strlen($value) - 4, 4);
+    }
 
     public function statusCard()
     {
